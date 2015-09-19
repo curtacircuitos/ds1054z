@@ -46,7 +46,7 @@ class DS1054Z(object):
     MIN_PROBE_RATIO = 0.01
     MAX_PROBE_RATIO = 1000
 
-    def __init__(self, device, backend='python_vxi11'):
+    def __init__(self, device, backend=None):
 
         self.possible_probe_ratio_values = self._populate_possible_values('PROBE_RATIO')
         self.possible_timebase_scale_values = self._populate_possible_values('TIMEBASE_SCALE')
@@ -56,6 +56,15 @@ class DS1054Z(object):
             setattr(self, method, functools.partial(self.call_dev, method))
 
         self.start = clock()
+        if not backend:
+            if device.startswith('USB::'):
+                backend = 'python_usbtmc'
+            elif device.startswith('TCPIP::') and device.endswith("::SOCKET"):
+                backend = 'tcp_socket'
+            elif device.startswith('TCPIP::')  and device.endswith("::INSTR"):
+                backend = 'python_vxi11'
+            else:
+                backend = 'python_vxi11'
         try:
             backend = import_backend(backend)
         except UsbtmcNoSuchBackend:
