@@ -74,7 +74,6 @@ class DS1054Z(object):
         self.dev = backend.Instrument(device)
 
         idn = self.idn
-        print(idn)
         assert re.match(self.IDN_PATTERN, idn)
         idn = idn.split(',')
         self.vendor = idn[0]
